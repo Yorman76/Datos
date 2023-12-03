@@ -1,0 +1,300 @@
+---
+title: "PRACTICA 2 (EVALUABLE): Fundamentos de estadística y probabilidad para Data Science"
+format: html
+editor: visual
+---
+
+------------------------------------------------------------------------
+```{r}
+library(ggplot2)
+```
+# 1. Distribución Logística
+
+La distribución logística es una distribución continua que se define por sus parámetros de escala y ubicación. Ha sido ampliamente utilizada en diversas disciplinas debido a sus propiedades matemáticas y su capacidad para modelar fenómenos con tasas de cambio gradual. Entre sus aplicaciones mas comunes, esta distribucion se relaciona con la regresion logística al modelar probabilidades en eventos binarios haciendo uso de la funcion logística, asi como la generación de numeros aleatorios.
+
+**Función de Densidad de Probabilidad (pdf)**
+
+La función de densidad de probabilidad (pdf) de la distribución logística está dada por la expresión matemática:
+
+**f(x; μ, s) = (exp(-(x - mu) / s)) / (s**\***(1 + exp(-(x - mu) / s))\^2)**
+
+Donde `mμ`: representa la ubicación de la media
+
+`s`: es el parámetro de escala.
+
+**Función de Distribución Acumulativa (CDF)**
+
+La función de distribución acumulativa (CDF) de la distribución logística es:
+
+**F(x; μ, s) = 1 / (1 + exp(-(x - mu) / s))**
+
+Esta función proporciona la probabilidad acumulativa de que una variable aleatoria de la distribución logística sea menor o igual a un valor dado x.
+
+## Cálculos de probabilidades. Funciones: `dlogis`, `plogis`, `qlogis`, `rlogis`
+
+Ejemplo de distribución logistica: Vamos a crear un vector que contenga 20 valores generados aleatoriamente, sigan una distribución logística con media (μ) 1 y escala (s) 2, haciendo uso de la funcion `rlogis`.
+
+```{r}
+set.seed(1010)
+x <- rlogis(20, location = 1, scale = 2)
+print(x)
+```
+
+Despues se calcula la densidad calculada por R de los valores, con la funcion `dlogis`
+
+```{r}
+fx <- dlogis(x, location = 1, scale = 2)
+print(fx)
+```
+
+Se crea un dataframe con los resultados:
+
+```{r}
+datos <- data.frame(x,fx)
+```
+
+Se grafican las densidades de probabilidad resultantes:
+
+```{r}
+ggplot(datos, aes(x, fx)) +
+geom_line(color = "blue", size = 1) +
+labs(title = "Función de Densidad de Probabilidad de la Distribución Logística", x = "Valores", y = "Densidad de Probabilidad")
+```
+
+Para obtener la distribución acumulada calculada con R, hacemos uso de la funcion `plogis`y los datos los pasamos al dataframe.
+
+```{r}
+datos$Fx <- plogis(x, location = 1, scale = 2)
+```
+
+Se grafican los valores de las distribuciones acumuladas calculadas:
+
+```{r}
+ggplot(datos, aes(x, Fx)) +
+geom_line(color = "blue", size = 1) +
+labs(title = "Función de Distribución Acumulativa (CDF) de la Distribución Logística",x = "Valores", y = "Probabilidad Acumulativa")
+```
+
+Para poder calcular los cuantiles de la distribucion logistica se hace uso de la funcion `qlogis`, el cual devuelve el valor correspondiente de la probabilidad para la cual se desea calcular el cuantil.
+
+```{r}
+# Primero se generan las probabilidades para calcular los percentiles
+v <- (0:1000)/1000
+# Despues se calculan los cuantiles
+res <- qlogis(v, location = 1, scale = 2)
+dflog <- data.frame(v,res)
+ggplot() +
+  geom_line(data = dflog, aes(v, res), color="blue", linewidth = 1) +
+  labs(
+    title = bquote("Gráfica de cuantiles " ~ mu ~ "= 175, " ~ sigma ~ "= 3"),
+    x = "Cuantiles",
+    y = "Altura") +
+  theme_bw()
+```
+
+# 2. Distribución t-student
+
+La distribución t de Student es una distribución de probabilidad que surge en inferencia estadística y análisis de muestras pequeñas. Esta distribución se utiliza principalmente en pruebas de hipótesis relacionadas con la media poblacional cuando la desviación estándar poblacional es desconocida y el tamaño de la muestra es pequeño.
+
+**Función de Densidad de Probabilidad (pdf)**
+
+La función de densidad de probabilidad (pdf) de la distribución logística está dada por la expresión matemática:
+
+**f(t; v)\<- (gamma((v + 1) / 2)) / (sqrt(v \* pi) \* gamma(v / 2)) \* ((1 + t\^2 / v)\^(-((v + 1) / 2)))**
+
+Donde `t`: representa la variable aleatoria
+
+`v`: son los grados de libertad
+
+**Funcion de Distribución Acumulativa**
+
+Se representa por la expresion matemática:
+
+**F(t; ν) = 1/2 + 1/2 * I(t/2, ν/2)**
+
+Donde `I` representa la función de la integral definida (acumulativa) de la distribución t
+
+## Cálculos de probabilidades. Funciones: `dt`, `pt`, `qt`, `rt`
+
+Ejemplo de distribución t de student: Creo un vector que contenga 100 valores que representarán una muestra aleatoria de la distribución t, definiendo 15 como numero de grados de libertad, haciendo uso de la funcion`rt`.
+
+```{r}
+set.seed(1011)
+random_t <- rt(100, df = 15)
+```
+
+Despues se calcula la densidad calculada por R de los valores, con la funcion `dlogis`
+
+```{r}
+densidad_t <- dt(random_t, df = 15)
+```
+
+Se crea un dataframe con los resultados:
+
+```{r}
+datos_t <- data.frame(random_t,densidad_t)
+```
+
+Se grafican las densidades de probabilidad resultantes:
+
+```{r}
+ggplot(datos_t, aes(random_t, densidad_t)) +
+geom_line(color = "blue", size = 1) +
+labs(title = "Función de Densidad de Probabilidad de la Distribución Logística", x = "Valores", y = "Densidad de Probabilidad")
+```
+
+Para obtener la distribución acumulada calculada de la distribucion t de student en R, hacemos uso de la funcion `pt`.
+
+```{r}
+datos_t$Fx <- pt(random_t, df = 15)
+```
+
+Se grafican los valores de las distribuciones acumuladas calculadas:
+
+```{r}
+ggplot(datos_t, aes(random_t, Fx)) +
+geom_line(color = "blue", size = 1) +
+labs(title = "Función de Distribución Acumulativa (CDF) de la Distribución Logística",x = "Valores", y = "Probabilidad Acumulativa")
+```
+
+Para poder calcular los cuantiles de la distribucion logistica se hace uso de la funcion `qlogis`, el cual devuelve el valor correspondiente de la probabilidad para la cual se desea calcular el cuantil.
+
+```{r}
+# Primero se generan las probabilidades para calcular los percentiles
+v2 <- (0:1000)/1000
+# Despues se calculan los cuantiles
+res2 <- qt(v2, df = 15)
+dflog2 <- data.frame(v2,res2)
+ggplot() +
+  geom_line(data = dflog2, aes(v2, res2), color="blue", linewidth = 1) +
+  labs(
+    title = bquote("Gráfica de cuantiles " ~ mu ~ "= 175, " ~ sigma ~ "= 3"),
+    x = "Cuantiles",
+    y = "Altura") +
+  theme_bw()
+```
+
+# 3. Distribución uniforme discreta
+
+Implementa tu versión de las funciones punifd, runifd, y dunifd
+
+#### Ejemplo de uso:
+
+***Generar 10 valores aleatorios con distribución uniforme discreta***
+
+***runif(10, a, b)***
+
+***\[1\] 1 3 2 3 2 3 6 1 2 3***
+
+***Generar valores aleatorios***
+
+```{r}
+runifnew <- function(n, a, b) 
+{ rdu <- sample(seq(a,b, by = 0.000001), size = n) 
+  return(rdu) 
+}
+```
+
+***Calcular fdp***
+
+```{r}
+dunifnew <- function(x, a, b) { 
+  dx <- 1/(b-a) 
+  if(x >= a & x <=b){ 
+  return(dx) 
+    }
+  else{ 
+  return(0) 
+    } 
+}
+```
+
+***Calcular CDF (distribución acumulada)***
+
+```{r}
+punifnew <- function(q, a, b) { 
+  pdu <- (q-a)/(b-a) 
+  return(pdu) 
+  }
+```
+
+***Calcular fdp para la secuencia 0:10***
+
+```{r}
+sapply(0:10,a = 1, b = 6, FUN = dunifnew)
+```
+
+***Calcular CDF para q = 4***
+
+```{r}
+cdf_q4 <- punifnew(4, 0, 1) 
+print(cdf_q4)
+```
+
+# Distribución Multinomial
+
+La distribución multinomial de probabilidad describe el número de veces que ocurre cada una de `k` resultados distintos en `n` ensayos independientes, donde cada resultado puede ocurrir con una probabilidad dada. Esta distribución es una generalización de la distribución binomial, que se aplica cuando hay dos resultados posibles.
+
+## Cálculos de probabilidades. Funciones: `dmultinom`,`rmultinom`
+
+Ejemplo de distribución multinomial: Para poder generar numeros aleatorios se hace uso de la funcion `rmultinom`. La sintaxis basica de esta función es la siguiente:
+
+rmultinom(r, size, prob)
+
+Donde:
+
+`r`: Número de muestras a generar. `size`: Número total de eventos en cada ensayo `prob`: Vector de probabilidades de los diferentes resultados.
+
+Por ejemplo si se desea generar 10 numeros aleatorios donde existen 6 eventos pro ensayo y unas probabilidad de ***0.3*** y ***0.7*** de que ocurra un evento por cada ensayo, se haria de la siguiente manera, obteniendo una matriz con los siguientes datos:
+
+```{r}
+rmultinom(10, size = 6, prob = c(0.3,0.7))
+```
+
+Para calcular la la función de masa de probabilidad se propone una incognita referente al ejemplo anterior. Por ejemplo si tenemos 10 pelotas de las cuales 4 son de color rojo, 4 de color azul y 2 de color negro y cogemos 5 de ellas ¿Cual es la probabilidad de obtener 3 de color rojo, 1 de color azul y 1 de color negro?
+
+```{r}
+dmultinom(c(3,1,1), size = 5, prob = c(0.4,0.4,0.2))
+```
+
+# 5. Distribución de Poisson
+
+La distribución de Poisson es una distribución de probabilidad discreta que describe el número de eventos que ocurrirán en un intervalo de tiempo o espacio fijo, bajo la condición de que estos eventos ocurren con una tasa promedio constante y de manera independiente entre sí. Su aplicación esta dirigida comunmente a la creación de modelos de eventos raros que ocurren de manera independiente y a una tasa constante, por ejemplo para calcular la  posibilidad de que ocurran accidentes de trafico en ciertas avenidas o llamadas telefonicos que se recibe en una empresa o central por hora, entre otros.
+
+La relación que existe entre la distribución de Poisson y la distribución exponencial radica en las maneras en como estas modelan procesos que ocurren referentes a los eventos que se producen, como en los intervalos de tiempo entre un evento y otro. Por ejemplo en un periodo de tiempo si se desea conocer el número de eventos que ocurren entre este intervalo a una tasa de promedio constante, se suele recurrir al uso de una distribución de Poisson, por el contrario, si se desea conocer el tiempo entre los eventos sucesivos que ocurrieron se utiliza una distribución exponencial. Ambas distribuciones se relacionan directamente por la tasa de promedio de eventos que es representada generalmente por el símbolo `lambda`.
+
+Para poder generar datos aleatorios en R siguiendo una distribucion de poisson, se puede utilizar la funcion `rpois`
+
+`rpois(n, lambda)`
+
+Donde:
+
+n: Vector de valores o observaciones que se realizarán.
+
+lambda: tasa de promedio de eventos (o número medio de eventos que ocurren en el intervalo)
+
+```{r}
+# Ejemplo si se desea tener 20 observaciones o datos aleatorios con una media de eventos de 5.
+rpois(20, lambda = 5)
+```
+De igual manera para poder conseguir la probabilidad de que un valor u observacion tome valores que sean menores o igual a un valor `q`, se puede representar con el uso de la funcion `ppois`.
+
+`rpois(q, lambda)`
+
+Donde:
+
+`q`: Es el cuantil o vector de cuantiles
+
+`lambda`: Tasa media de eventos
+
+Por ejemplo se se desea calcular la probabilidad de observar 16 eventos en un intervalo de tiempo donde la media de eventos que suelen ocurrir es 20, se puede calcular de la siguiente manera:
+```{r}
+ppois(16, lambda = 20)
+```
+El resultado equivale a la suma de probabilidades de cada observacion anterior ocurrida hasta el evento 16º.
+
+En el caso de que se desee conocer la probabilidad de observar mas de 16 visitas en ese mismo intervalo de tiempo del ejemplo anterior:
+```{r}
+1 - ppois(16, lambda = 20) 
+```
+
